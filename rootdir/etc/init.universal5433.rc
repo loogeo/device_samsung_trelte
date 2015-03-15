@@ -755,11 +755,23 @@ on property:ro.debuggable=1
     chmod 0666 /sys/class/mhl/test_v2
     chmod 0666 /sys/class/mhl/connection
 
+service cpboot-daemon /sbin/cbd -d -tstem7400 -bl -ml -p 13
+    class main
+    user root
+    group radio cache inet misc audio sdcard_rw log sdcard_r shell
+    #seclabel u:r:cbd:s0
+
 # ARGOSD
 service argos-daemon /system/bin/argosd
     class main
     user system
     group system radio
+
+# MobiCore startup
+service mobicore /system/bin/mcDriverDaemon -r /system/app/FFFFFFFF000000000000000000000001.drbin -r /system/app/mcRegistry/ffffffffd0000000000000000000000a.tlbin
+    class core
+    user system
+    group system
 
 # ExyRng startup
 service exyrngd /system/bin/exyrngd -b
@@ -808,13 +820,6 @@ service gpsd /system/bin/gpsd -c /system/etc/gps.xml
     user gps
     group system inet net_raw
     ioprio be 0
-
-
-# MobiCore startup
-service mobicore /system/bin/mcDriverDaemon -r /system/app/FFFFFFFF000000000000000000000001.drbin -r /system/app/mcRegistry/ffffffffd0000000000000000000000a.tlbin -r /system/app/mcRegistry/ffffffffd00000000000000000000016.tlbin
-    class core
-    user system
-    group system
 
 # on userdebug and eng builds, enable kgdb on the serial console
 on property:ro.debuggable=1
